@@ -386,4 +386,24 @@
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;$(GamePath)/Mods&quot;" />
 	</Target>
+
+	<Target Name="PackageMod" AfterTargets="PostBuild">
+		<PropertyGroup>
+			<DistDir>$(MSBuildProjectDirectory)\dist</DistDir>
+			<StagingDir>$(DistDir)\staging\$(Configuration)</StagingDir>
+			<ZipName Condition="'$(Configuration)'=='Debug'">MageDrova_Dev.zip</ZipName>
+			<ZipName Condition="'$(ZipName)'==''">MageDrova.zip</ZipName>
+			<ZipPath>$(DistDir)\$(ZipName)</ZipPath>
+		</PropertyGroup>
+
+		<RemoveDir Directories="$(StagingDir)" />
+		<MakeDir Directories="$(DistDir);$(StagingDir)\Mods" />
+
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(StagingDir)\Mods" />
+
+		<Delete Files="$(ZipPath)" />
+		<Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;Compress-Archive -Path '$(StagingDir)\*' -DestinationPath '$(ZipPath)' -Force&quot;" />
+
+		<Message Importance="high" Text="Packaged $(Configuration) build -&gt; $(ZipPath)" />
+	</Target>
 </Project>
