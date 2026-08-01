@@ -14,7 +14,7 @@ using Il2CppDrova.Talent;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(MageDrova.Core), "MageDrova", "1.0.1", "TrustNoOneElse", null)]
+[assembly: MelonInfo(typeof(MageDrova.Core), "MageDrova", "1.1.0", "TrustNoOneElse")]
 [assembly: MelonGame("Just2D", "Drova")]
 [assembly: MelonAdditionalDependencies("Drova_Modding_API")]
 
@@ -27,26 +27,23 @@ namespace MageDrova
 		private const string GVarListName = "Mage_mod";
 		private const string GBoolName = "Choose_Path";
 		public const string GuidTalent = "6a83177d-4d25-4756-a168-d5ea864a17b8";
+		private const int DefaultHealthPerLevel = 5;
+		private const int BasePlayerMaxHealth = 40;
 		private bool _isInitialized;
-		private static bool _isPunishmentActive;
-		private int _lastHeroIndex = -1;
-		private static bool _delayedPunishment;
+		private static int _appliedMaxHealthPenalty;
 
 		public override void OnInitializeMelon()
 		{
 			PlayerAccess.OnPlayerFound += OnPlayerAccessOnOnPlayerFound;
 			SaveGameSystem.BeforeSaveGameLoaded += OnBeforeSaveGameLoaded;
+			MageOptions.Register();
 		}
 		private void OnBeforeSaveGameLoaded(Savegame saveGame)
 		{
-			if (_lastHeroIndex != saveGame._metaInfo._heroIndex)
-			{
-				MelonLogger.Msg("Reset punishment state");
-				_isPunishmentActive = false;
-			}
-			_lastHeroIndex = saveGame._metaInfo._heroIndex;
+			MelonLogger.Msg("Reset punishment state");
+			_appliedMaxHealthPenalty = 0;
 		}
-		
+
 		private static bool GetGvar(out GBool choosePath)
 		{
 
@@ -75,7 +72,7 @@ namespace MageDrova
 			GetGvar(out var choosePath);
 			if (choosePath == null) return;
 			MelonLogger.Msg($"[OnGvarBusSystemOnOnGBoolValueChanged] Choose_Path value: {choosePath.GetValue()}");
-			if (choosePath.GetValue()) ActivatePlayerPunishment();
+			if (choosePath.GetValue()) ApplyPenaltyState();
 		}
 
 		private static void OnPlayerAccessOnOnPlayerFound(Actor player)
@@ -85,23 +82,18 @@ namespace MageDrova
 			{
 				ActivateRegenMod();
 			}
-			if (_delayedPunishment)
-			{
-				_delayedPunishment = false;
-				ActivatePlayerPunishment();
-			}
+			_appliedMaxHealthPenalty = 0;
 			if(GetGvar(out var choosePath) || choosePath == null) return;
 			MelonLogger.Msg($"[OnPlayerAccessOnOnPlayerFound] Choose_Path value: {choosePath.GetValue()}");
 			if (!choosePath.GetValue())
 			{
 				GvarBusSystem.OnGBoolValueChanged -= OnGvarBusSystemOnOnGBoolValueChanged;
 				GvarBusSystem.OnGBoolValueChanged += OnGvarBusSystemOnOnGBoolValueChanged;
+				DeactivatePlayerPunishment();
+				return;
 			}
-			else
-			{
-				_isPunishmentActive = true;
-				ActivatePlayerPunishment();
-			}
+
+			ApplyPenaltyState();
 		}
 
 		public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -110,6 +102,7 @@ namespace MageDrova
 			if (_isInitialized) return;
 			if (sceneName == SceneNames.MainMenu)
 			{
+				MageOptions.RegisterLocalization();
 				if (ExternalEntityInfoRegistry.TryGetByDefinitionId(DefinitionId, out var entityInfo))
 				{
 					var talent = ScriptableObject.CreateInstance<TalentContainer>();
@@ -139,30 +132,90 @@ namespace MageDrova
 
 		public static void ActivateRegenMod()
 		{
+			
+			var player = PlayerAccess.GetPlayer();
+			if (player == null)
+			{
+				MelonLogger.Msg("Couldn't activating regen mod");
+				return;
+			}
 			MelonLogger.Msg("Activating regen mod");
-			var passiveReg = PlayerAccess.GetPlayer().GetFlowBehaviour()._passiveReg;
+			var passiveReg = player.GetFlowBehaviour()._passiveReg;
 			passiveReg._flowMultStat.CreateModifier(1.5f, ModifiableFloat.Mode.Mult);
 			passiveReg._orientationStat.CreateModifier(100, ModifiableFloat.Mode.Add);
 		}
 
-		public static void ActivatePlayerPunishment()
+		public static void RefreshPenaltyState()
 		{
-			var player = PlayerAccess.GetPlayer();
-			if (player == null || !LoadingScreenHandler.Instance.IsWorldReady() || SceneGameHandler.IsLoadingScreenActive)
+			if (PlayerAccess.GetPlayer() == null) return;
+			if (GetGvar(out var choosePath) || choosePath == null) return;
+			if (!choosePath.GetValue()) return;
+			ApplyPenaltyState();
+		}
+
+		private static void ApplyPenaltyState()
+		{
+			if (MageOptions.IsPenaltyEnabled())
 			{
-				MelonLogger.Msg("Player not ready yet, delaying punishment");
-				_delayedPunishment = true;
+				ActivatePlayerPunishment();
 				return;
 			}
-			MelonLogger.Msg("Player punishment activated");
-			
-			var stats = player._stats.Cast<PlayerAttributeStats>();
-			if (stats.LearningData._healthPerLevel != 5) return;
-			stats.LearningData._healthPerLevel /= 2;
-			if (_isPunishmentActive) return;
-			_isPunishmentActive = true;
-			player._health.SetMaxHealth(player._health.MaxHealth / 2);
-
+			DeactivatePlayerPunishment();
 		}
+
+		public static void ActivatePlayerPunishment()
+		{
+			if (!MageOptions.IsPenaltyEnabled()) return;
+			if (!TryGetReadyPlayer(out var player))
+			{
+				MelonLogger.Msg("Player not ready yet, skipping punishment");
+				return;
+			}
+			RepairBakedInHalving(player);
+			SetMaxHealthPenalty(player, -(player._health.BaseMaxHealth / 2));
+		}
+
+		public static void DeactivatePlayerPunishment()
+		{
+			if (!TryGetReadyPlayer(out var player))
+			{
+				MelonLogger.Msg("Player not ready yet, skipping punishment removal");
+				return;
+			}
+			RepairBakedInHalving(player);
+			SetMaxHealthPenalty(player, 0);
+		}
+
+		private static bool TryGetReadyPlayer(out Actor player)
+		{
+			player = PlayerAccess.GetPlayer();
+			if (player == null) return false;
+			return LoadingScreenHandler.Instance.IsWorldReady() && !SceneGameHandler.IsLoadingScreenActive;
+		}
+
+		private static void SetMaxHealthPenalty(Actor player, int penalty)
+		{
+			int delta = penalty - _appliedMaxHealthPenalty;
+			if (delta != 0)
+			{
+				player._health.AddRuntimeMaxHealth(delta);
+			}
+			_appliedMaxHealthPenalty = penalty;
+			MelonLogger.Msg($"Penalty {penalty} applied (delta {delta}), base {player._health.BaseMaxHealth}, max {player._health.MaxHealth}");
+		}
+
+		private static void RepairBakedInHalving(Actor player)
+		{
+			var stats = player._stats.Cast<PlayerAttributeStats>();
+			stats.LearningData._healthPerLevel = DefaultHealthPerLevel;
+
+			int minimumMaxHealth = BasePlayerMaxHealth + (stats.Level - 1) * DefaultHealthPerLevel;
+			int missing = minimumMaxHealth - player._health.BaseMaxHealth;
+			if (missing <= 0) return;
+
+			player._health.ChangeMaxHealth(missing, false);
+			MelonLogger.Msg($"Repaired base max health of level {stats.Level} player by {missing} to {player._health.BaseMaxHealth}");
+		}
+
 	}
 }

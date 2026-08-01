@@ -378,6 +378,7 @@
 
 	<ItemGroup>
 		<Compile Include="Core.cs" />
+		<Compile Include="MageOptions.cs" />
 		<Compile Include="TalentActorModulePatch.cs" />
 		<Content Include="Directory.Build.props" />
 	</ItemGroup>
