@@ -391,19 +391,25 @@
 		<PropertyGroup>
 			<DistDir>$(MSBuildProjectDirectory)\dist</DistDir>
 			<StagingDir>$(DistDir)\staging\$(Configuration)</StagingDir>
+			<!-- The in-game Modding API exports the authored content (GlobalVars, NpcDialogues, NpcPlacement, Localization); we only swap in the freshly built dll. -->
+			<ExportZip>$(GamePath)\Mods\Modding_API\Exports\mage_mod.zip</ExportZip>
 			<ZipName Condition="'$(Configuration)'=='Debug'">MageDrova_Dev.zip</ZipName>
 			<ZipName Condition="'$(ZipName)'==''">MageDrova.zip</ZipName>
 			<ZipPath>$(DistDir)\$(ZipName)</ZipPath>
 		</PropertyGroup>
 
-		<RemoveDir Directories="$(StagingDir)" />
-		<MakeDir Directories="$(DistDir);$(StagingDir)\Mods" />
+		<Error Condition="!Exists('$(ExportZip)')"
+		       Text="Modding API export missing: $(ExportZip) - re-export mage_mod from the in-game Modding API before packaging." />
 
+		<RemoveDir Directories="$(StagingDir)" />
+		<MakeDir Directories="$(DistDir);$(StagingDir)" />
+
+		<Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;Expand-Archive -Path '$(ExportZip)' -DestinationPath '$(StagingDir)' -Force&quot;" />
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(StagingDir)\Mods" />
 
 		<Delete Files="$(ZipPath)" />
 		<Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;Compress-Archive -Path '$(StagingDir)\*' -DestinationPath '$(ZipPath)' -Force&quot;" />
 
-		<Message Importance="high" Text="Packaged $(Configuration) build -&gt; $(ZipPath)" />
+		<Message Importance="high" Text="Packaged $(Configuration) build (export: $(ExportZip)) -&gt; $(ZipPath)" />
 	</Target>
 </Project>
