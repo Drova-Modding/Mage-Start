@@ -37,6 +37,8 @@ namespace MageDrova
 			PlayerAccess.OnPlayerFound += OnPlayerAccessOnOnPlayerFound;
 			SaveGameSystem.BeforeSaveGameLoaded += OnBeforeSaveGameLoaded;
 			MageOptions.Register();
+
+			GVarSyncAccess.MarkListLocal(GVarListName);
 		}
 		private void OnBeforeSaveGameLoaded(Savegame saveGame)
 		{
