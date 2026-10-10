@@ -14,7 +14,7 @@ using Il2CppDrova.Talent;
 using MelonLoader;
 using UnityEngine;
 
-[assembly: MelonInfo(typeof(MageDrova.Core), "MageDrova", "1.1.1", "TrustNoOneElse")]
+[assembly: MelonInfo(typeof(MageDrova.Core), "MageDrova", "1.2.0", "TrustNoOneElse")]
 [assembly: MelonGame("Just2D", "Drova")]
 [assembly: MelonAdditionalDependencies("Drova_Modding_API")]
 
