@@ -1,0 +1,24 @@
+# One of Rowan's morph forms in a session: B casts, A sees B as that creature and is not morphed itself, and both of B's
+# attack keys wound the shared ripper on A's machine too. The morph keeps running: morph_coop_end.part ends it.
+# The ripper pack fights back: a press is retried while the creature is stunned.
+# Parameters: form, body, reach, reach2, gap, secondary (as in morph_form.part), ripper (guid of the shared target).
+
+B run adjusthealth 1000
+B xp mark
+B expect useitem mage_morph_$form 0.3 idle contains "used mage_morph_$form" timeout=20
+B expect morph contains "body=$body" timeout=10
+B expect mage_morph contains "buffed=1" timeout=5
+# The morph itself pays no experience, only kills do.
+B expect xp gained == 0
+B invincible on
+A expect actors 800 contains "Morph" timeout=10
+A expect morph == morphed=0
+
+A tpnear $ripper 120 0
+A expect near $ripper 1000 contains "loaded" timeout=15
+set key PrimaryAttack
+set at $reach
+include morph_coop_attack.part
+set key $secondary
+set at $reach2
+include morph_coop_attack.part

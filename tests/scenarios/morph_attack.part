@@ -1,0 +1,22 @@
+# One attack key of $P's creature wounds a fresh red fox, in three tries.
+# Parameters: P (player letter), key (PrimaryAttack, SecondaryAttack or Dodge), at (distance to strike from), gap (seconds between tries).
+
+# Back to dry ground first: every fight ends a few steps east, and the bear cannot reach a fox in the water.
+$P tp $spot
+$P spawn RedFox 60 0
+$P expect health RedFox == 500/500 timeout=30
+# The root trap holds the fox still, so the attacks are tested, not the aim.
+$P effect add StatusEffect_RootTrap_Root RedFox
+$P tpnear RedFox $at 0
+$P look RedFox
+$P expect press $key 0.2 !contains "Stunned" timeout=10
+sleep $gap
+$P tpnear RedFox $at 0
+$P look RedFox
+$P expect press $key 0.2 !contains "Stunned" timeout=10
+sleep $gap
+$P tpnear RedFox $at 0
+$P look RedFox
+$P expect press $key 0.2 !contains "Stunned" timeout=10
+$P expect health RedFox !contains "500/500" timeout=6
+$P hit RedFox 9999 pure

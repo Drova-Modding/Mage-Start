@@ -7,7 +7,8 @@
 		<LangVersion>default</LangVersion>
 		<IsPackable>false</IsPackable>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
-		<FileVersion>1.0.0.0</FileVersion>
+		<Version>1.3.0</Version>
+		<FileVersion>1.3.0.0</FileVersion>
 		<NeutralLanguage>en-US</NeutralLanguage>
 		<AssemblyName>MageDrova</AssemblyName>
 		<LangVersion>latest</LangVersion>
@@ -379,13 +380,21 @@
 	<ItemGroup>
 		<Compile Include="Core.cs" />
 		<Compile Include="MageOptions.cs" />
+		<Compile Include="Morphing.cs" />
+		<Compile Include="MorphCritPatch.cs" />
 		<Compile Include="TalentActorModulePatch.cs" />
 		<Content Include="Directory.Build.props" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;$(GamePath)/Mods&quot;" />
+		<Copy SourceFiles="@(ModdingApiItems)" DestinationFolder="$(GamePath)\Mods\Modding_API\Items" />
 	</Target>
+
+	<ItemGroup>
+		<!-- The morph spells and their recipes. The API reads them from its Items folder at every main menu. -->
+		<ModdingApiItems Include="Data\Items\*.json" />
+	</ItemGroup>
 
 	<Target Name="PackageMod" AfterTargets="PostBuild">
 		<PropertyGroup>
@@ -406,6 +415,7 @@
 
 		<Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;Expand-Archive -Path '$(ExportZip)' -DestinationPath '$(StagingDir)' -Force&quot;" />
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(StagingDir)\Mods" />
+		<Copy SourceFiles="@(ModdingApiItems)" DestinationFolder="$(StagingDir)\Mods\Modding_API\Items" />
 
 		<Delete Files="$(ZipPath)" />
 		<Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;Compress-Archive -Path '$(StagingDir)\*' -DestinationPath '$(ZipPath)' -Force&quot;" />

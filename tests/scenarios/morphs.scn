@@ -1,0 +1,207 @@
+# Rowan's morph spells, one game: the level gate, every form's attack, kill experience and health cost, the attribute
+# scaling, the Beast Bond chain and the morph talents.
+# Debug builds of the Modding API and MageDrova, deployed with Data/Items/mage_mod.json.
+#
+# dotnet run --project "../Drova Modding API/tools/Drova.TestRunner" -c Debug -- tests/scenarios/morphs.scn
+
+default hero 5
+default slot 0
+set P A
+# The save starts on dry ground here.
+set spot -2132,-5262
+set reach 12
+set reach2 12
+set gap 2
+set secondary SecondaryAttack
+
+launch A
+A wait ready=1 timeout=240
+A wait saves=separate timeout=1
+A load $hero $slot
+A wait world=1 timeout=240
+
+A expect xp contains "level=1 " timeout=5
+A expect health me == 40/40
+A give mage_morph_waterrat 1
+A give mage_morph_bloodfly 1
+A give mage_morph_hungryripper 1
+A give mage_morph_rotmoorfly 1
+A give mage_morph_ripper 1
+A give mage_morph_boar 1
+A give mage_morph_shadowripper 1
+A give mage_morph_harpy 1
+A give mage_morph_bear 1
+# Mind makes the morphs last long enough for every attack of the late forms.
+A run mind 100
+A stance combat
+
+# The bear needs level 20: its slot is refused, and nothing morphs.
+A expect useitem mage_morph_bear 0.3 idle contains "refused" timeout=20
+A expect morph == morphed=0
+
+set form waterrat
+set body WaterRat
+set caster 36/40
+set secondary PrimaryAttack
+include morph_form.part
+include morph_end.part
+set secondary SecondaryAttack
+
+A run levelup
+A run levelup
+set form bloodfly
+set body Bloodquito_Auwald
+set caster 45/50
+# Its second key spits from afar.
+set reach2 100
+include morph_form.part
+include morph_end.part
+set reach2 12
+
+A run levelup
+A run levelup
+A run levelup
+set form hungryripper
+set body HungryRipper
+set caster 55/65
+include morph_form.part
+include morph_end.part
+
+A run levelup
+A run levelup
+set form rotmoorfly
+set body Bloodquito_Rotmoor
+set caster 63/75
+# Its second key spits from afar.
+set reach2 100
+include morph_form.part
+include morph_end.part
+set reach2 12
+
+A run levelup
+A run levelup
+set form ripper
+set body Ripper
+set caster 68/85
+include morph_form.part
+include morph_end.part
+
+A run levelup
+A run levelup
+set form boar
+set body Boar
+set caster 76/95
+# The boar charges until it hits something.
+set gap 3.5
+include morph_form.part
+include morph_end.part
+set gap 2
+
+A run levelup
+A run levelup
+A run levelup
+set form shadowripper
+set body ShadowRipper
+set caster 82/110
+include morph_form.part
+include morph_end.part
+
+A run levelup
+A run levelup
+A run levelup
+set form harpy
+set body Harpy
+set caster 93/125
+# The harpy kicks with a lunge that overshoots a close target.
+set reach 30
+set reach2 30
+set gap 3.5
+include morph_form.part
+# The weapon swap key moves the harpy to its ranged set, fan and throw, and back. Its scream is on the dodge key.
+A morph swap
+A expect morph contains "set=2" timeout=3
+set key PrimaryAttack
+set at 60
+include morph_attack.part
+set key SecondaryAttack
+set at 80
+include morph_attack.part
+set key Dodge
+set at 30
+include morph_attack.part
+A morph swap
+A expect morph contains "set=0" timeout=3
+include morph_end.part
+set reach 12
+set reach2 12
+
+A run levelup
+A run levelup
+set form bear
+set body Bear
+set caster 94/135
+# The bear's body slam lunges past anything closer than 45, its claws reach from 10 to 60.
+set reach 50
+set reach2 30
+include morph_form.part
+# The weapon swap key moves the bear to its second set, dash bite and ground slam, and back. Its rush is on the dodge key.
+A morph swap
+A expect morph contains "set=1" timeout=3
+set key PrimaryAttack
+set at 30
+include morph_attack.part
+set key SecondaryAttack
+include morph_attack.part
+set key Dodge
+set at 60
+include morph_attack.part
+A morph swap
+A expect morph contains "set=0" timeout=3
+include morph_end.part
+set reach 12
+set reach2 12
+set gap 2
+A expect xp contains "level=20 " timeout=5
+
+# Mind and the levels past the form's own raise its damage, Strength its health, Dexterity its crit chance.
+A run strength 50
+A run dex 50
+A run adjusthealth 1000
+A expect useitem mage_morph_ripper 0.3 idle contains "used mage_morph_ripper" timeout=20
+A expect mage_morph contains "buffed=1" timeout=5
+A expect mage_morph !contains "damage=1 " timeout=1
+A expect mage_morph !contains "crit=0 " timeout=1
+A morph end
+A expect morph == morphed=0 timeout=5
+
+# Beast Bond: II and III wait for the rank before them, and each rank counts.
+A expect talent canlearn BeastBond2 == no
+A expect talent canlearn BeastBond1 == yes
+A talent learn BeastBond1
+A expect talent canlearn BeastBond2 == yes
+A expect talent canlearn BeastBond3 == no
+A talent learn BeastBond2
+A talent learn BeastBond3
+A run adjusthealth 1000
+A expect useitem mage_morph_ripper 0.3 idle contains "used mage_morph_ripper" timeout=20
+A expect mage_morph contains "bond=3 buffed=1" timeout=5
+A morph end
+A expect morph == morphed=0 timeout=5
+
+# Feral Recovery: 20 percent back when the morph ends. 135 - 27 + 27.
+A talent learn FeralRecovery
+A run adjusthealth 1000
+A expect useitem mage_morph_ripper 0.3 idle contains "used mage_morph_ripper" timeout=20
+A expect morph contains "body=Ripper" timeout=10
+A morph end
+A expect health me == 135/135 timeout=3
+
+# Second Skin: the creature dies, the player lives on with 1 health.
+A talent learn SecondSkin
+A run adjusthealth 1000
+A expect useitem mage_morph_ripper 0.3 idle contains "used mage_morph_ripper" timeout=20
+A expect morph contains "body=Ripper" timeout=10
+A hit me 9999 pure nosource
+A expect morph == morphed=0 timeout=5
+sleep 1
+A expect health me == 1/135 timeout=3

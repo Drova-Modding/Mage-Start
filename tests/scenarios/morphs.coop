@@ -1,0 +1,259 @@
+# Rowan's morph spells in a session: morph talents stay with the player who learned them, every form's attack keys wound a
+# creature on the teammate's machine, a morphed kill pays experience to both players, and Second Skin keeps a client up.
+# Debug builds of the Modding API, Drova-Coop-Mod and MageDrova, deployed with Data/Items/mage_mod.json.
+#
+# dotnet run --project "../Drova Modding API/tools/Drova.TestRunner" -c Debug -- tests/scenarios/morphs.coop
+
+# Creatures take a third of each wound (300 is the most the session allows), and five rippers share the forms. B keeps its
+# base Mind: Mind raises a morph's damage, and at 100 the harpy alone kills two rippers.
+set enemyhealth 300
+include ../../../Drova-Coop-Mod/tests/scenarios/session.coop
+
+set ripper1 6be18490-966b-47a5-bb24-f587c154aa28
+set ripper2 53307ce2-1d1e-4f7c-aac3-b8524391212c
+set ripper3 168092bb-3714-4ea2-8326-a2b2769af7a9
+set ripper4 d11a6aaa-a7e5-46e4-949c-d11f291bd3ef
+set ripper5 51e7122a-9561-48fd-bebe-2035249d08c9
+set ripper $ripper1
+set reach 12
+set reach2 12
+set gap 2
+set secondary SecondaryAttack
+
+A invincible on
+B give mage_morph_waterrat 1
+B give mage_morph_bloodfly 1
+B give mage_morph_hungryripper 1
+B give mage_morph_rotmoorfly 1
+B give mage_morph_ripper 2
+B give mage_morph_boar 1
+B give mage_morph_shadowripper 1
+B give mage_morph_harpy 1
+B give mage_morph_bear 1
+B stance combat
+
+# B's Beast Bond reaches B's body on A's machine, never A.
+B talent learn BeastBond1
+A expect talents DrovaCoop.Remote BeastBond contains "BeastBond1" timeout=10
+A expect talents me BeastBond == 0
+
+B tpnear $ripper 150 0
+A tpnear $ripper 120 0
+A expect near $ripper 1000 contains "loaded" timeout=15
+B expect near $ripper 1000 contains "loaded" timeout=15
+
+set form waterrat
+set body WaterRat
+set secondary PrimaryAttack
+include morph_coop_form.part
+include morph_coop_end.part
+set secondary SecondaryAttack
+B expect mage_morph contains "bond=1 buffed=1"
+A expect mage_morph == none
+
+B run levelup
+B run levelup
+set form bloodfly
+set body Bloodquito_Auwald
+set reach2 70
+include morph_coop_form.part
+include morph_coop_end.part
+set reach2 12
+
+B run levelup
+B run levelup
+B run levelup
+set form hungryripper
+set body HungryRipper
+include morph_coop_form.part
+include morph_coop_end.part
+
+B run levelup
+B run levelup
+set form rotmoorfly
+set body Bloodquito_Rotmoor
+set reach2 70
+include morph_coop_form.part
+include morph_coop_end.part
+set reach2 12
+
+B run levelup
+B run levelup
+set form ripper
+set body Ripper
+include morph_coop_form.part
+include morph_coop_end.part
+
+B run levelup
+B run levelup
+# The first ripper must live on for the kill at the end: the second takes the boar and the shadowripper.
+set ripper $ripper2
+set form boar
+set body Boar
+# The boar charges until it hits something.
+set gap 3.5
+include morph_coop_form.part
+include morph_coop_end.part
+set gap 2
+
+B run levelup
+B run levelup
+B run levelup
+set form shadowripper
+set body ShadowRipper
+include morph_coop_form.part
+include morph_coop_end.part
+
+B run levelup
+B run levelup
+B run levelup
+# The harpy and the bear wear out a ripper per weapon set.
+set ripper $ripper4
+set form harpy
+set body Harpy
+set reach 30
+set reach2 30
+set gap 3.5
+include morph_coop_form.part
+# Without Mind the morph runs out before the second weapon set: cast it again.
+include morph_coop_end.part
+B run adjusthealth 1000
+B expect useitem mage_morph_$form 0.3 idle contains "used mage_morph_$form" timeout=20
+B expect morph contains "body=$body" timeout=10
+B invincible on
+A expect actors 800 contains "Morph" timeout=10
+# The weapon swap key moves the harpy to its ranged set, fan and throw, and back. Its scream is on the dodge key.
+# From the west: east of this ripper lie ruins whose wall stops the harpy's throws.
+B morph swap
+B expect morph contains "set=2" timeout=3
+# A's copy of B replays the attacks of the set B swapped to.
+A actlog start DrovaCoop.Remote.1.Morph
+set key PrimaryAttack
+set at -60
+include morph_coop_attack.part
+set key SecondaryAttack
+set at -80
+include morph_coop_attack.part
+A expect actlog brief contains "AA_Harpy_Range_Throw" timeout=5
+set key Dodge
+set at -30
+include morph_coop_attack.part
+B morph swap
+B expect morph contains "set=0" timeout=3
+include morph_coop_end.part
+
+# With friendly fire off, B's harpy cannot hurt A: its throws and fans at A's body are dropped on B's machine, no blood there.
+B run adjusthealth 1000
+B expect useitem mage_morph_harpy 0.3 idle contains "used mage_morph_harpy" timeout=20
+B expect morph contains "body=Harpy" timeout=10
+B invincible on
+B morph swap
+B expect morph contains "set=2" timeout=3
+B tpnear DrovaCoop.Remote.0 80 0
+B look DrovaCoop.Remote.0
+B expect press SecondaryAttack 0.2 !contains "Stunned" timeout=10
+sleep 3.5
+B tpnear DrovaCoop.Remote.0 60 0
+B look DrovaCoop.Remote.0
+B expect press PrimaryAttack 0.2 !contains "Stunned" timeout=10
+B expect counter morphspared >= 1 timeout=6
+include morph_coop_end.part
+
+B run levelup
+B run levelup
+set ripper $ripper3
+set form bear
+set body Bear
+# Its body slam lunges past anything closer than 45.
+set reach 50
+include morph_coop_form.part
+# Without Mind the morph runs out before the second weapon set: cast it again.
+include morph_coop_end.part
+B run adjusthealth 1000
+B expect useitem mage_morph_$form 0.3 idle contains "used mage_morph_$form" timeout=20
+B expect morph contains "body=$body" timeout=10
+B invincible on
+A expect actors 800 contains "Morph" timeout=10
+set ripper $ripper5
+A tpnear $ripper 120 0
+A expect near $ripper 1000 contains "loaded" timeout=15
+# The weapon swap key moves the bear to its second set, dash bite and ground slam, and back. Its rush is on the dodge key.
+B morph swap
+B expect morph contains "set=1" timeout=3
+# A's copy of B replays the attacks of the set B swapped to.
+A actlog start DrovaCoop.Remote.1.Morph
+set key PrimaryAttack
+set at 30
+include morph_coop_attack.part
+set key SecondaryAttack
+include morph_coop_attack.part
+A expect actlog brief contains "AA_Bear_Melee_GroundSlam" timeout=5
+# The bear's slow attacks outlast one cast: cast it again for the rush.
+include morph_coop_end.part
+B run adjusthealth 1000
+B expect useitem mage_morph_$form 0.3 idle contains "used mage_morph_$form" timeout=20
+B expect morph contains "body=$body" timeout=10
+B invincible on
+A expect actors 800 contains "Morph" timeout=10
+B morph swap
+B expect morph contains "set=1" timeout=3
+# The rush only moves the bear and wounds nothing, on either machine: A sees it replayed instead.
+A actlog start DrovaCoop.Remote.1.Morph
+B tpnear $ripper 60 0
+B look $ripper
+B expect press Dodge 0.2 !contains "Stunned" timeout=10
+A expect actlog brief contains "AA_Bear_Special_Rush" timeout=5
+B morph swap
+B expect morph contains "set=0" timeout=3
+include morph_coop_end.part
+set reach 12
+set reach2 12
+set gap 2
+
+# A morph of A's own carries none of B's Beast Bond.
+A give mage_morph_ripper 1
+A stance combat
+A run levelup
+A run levelup
+A run levelup
+A run levelup
+A run levelup
+A run levelup
+A run levelup
+A run levelup
+A run levelup
+A expect useitem mage_morph_ripper 0.3 idle contains "used mage_morph_ripper" timeout=20
+A expect mage_morph contains "bond=0 buffed=1" timeout=5
+B expect morph == morphed=0
+A morph end
+A expect morph == morphed=0 timeout=5
+A invincible on
+
+# A kill as a creature pays B, and the session shares it with A.
+B run adjusthealth 1000
+B expect useitem mage_morph_ripper 0.3 idle contains "used mage_morph_ripper" timeout=20
+B expect morph contains "body=Ripper" timeout=10
+B invincible on
+B tpnear $ripper1 40 0
+A tpnear $ripper1 120 0
+A expect near $ripper1 1000 contains "loaded" timeout=15
+B expect near $ripper1 1000 contains "loaded" timeout=15
+A xp mark
+B xp mark
+B hit $ripper1 99999 pure
+B expect xp gained >= 60 timeout=5
+A expect xp gained >= 1 timeout=10
+B morph end
+B expect morph == morphed=0 timeout=5
+
+# Second Skin: B's creature dies, B stays on its feet with 1 health, and nobody's run ends.
+B talent learn SecondSkin
+B run adjusthealth 1000
+B expect useitem mage_morph_ripper 0.3 idle contains "used mage_morph_ripper" timeout=20
+B expect morph contains "body=Ripper" timeout=10
+B hit me 9999 pure nosource
+B expect morph == morphed=0 timeout=5
+B expect health me == 1/135 timeout=3
+B expect ai me !contains mode=KnockOut timeout=1
+A expect counter gameovers <= 0 timeout=1
+B expect counter gameovers <= 0 timeout=1

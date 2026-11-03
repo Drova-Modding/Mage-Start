@@ -1,0 +1,185 @@
+{
+  "Version": 1,
+  "Items": [
+    {
+      "ReadableId": "mage_morph_waterrat",
+      "Base": "flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "IconItem": "cons_flow_conjure_rats",
+      "Morph": {
+        "Creature": "18d0be35a54cdce448b34771277ebbcc",
+        "Duration": 60,
+        "HealthCost": 10,
+        "RequiredLevel": 1
+      }
+    },
+    {
+      "ReadableId": "mage_recipe_morph_waterrat",
+      "Base": "recipe_flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "BuyValue": 100,
+      "SellValue": 20,
+      "LearnSpell": "mage_morph_waterrat"
+    },
+    {
+      "ReadableId": "mage_morph_bloodfly",
+      "Base": "flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "IconItem": "item_brokenwings",
+      "Morph": {
+        "Creature": "7212c105223d75441b2563b7df24d717",
+        "Duration": 60,
+        "HealthCost": 10,
+        "RequiredLevel": 3
+      }
+    },
+    {
+      "ReadableId": "mage_recipe_morph_bloodfly",
+      "Base": "recipe_flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "BuyValue": 150,
+      "SellValue": 30,
+      "LearnSpell": "mage_morph_bloodfly"
+    },
+    {
+      "ReadableId": "mage_morph_hungryripper",
+      "Base": "flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "IconItem": "item_ripperfur",
+      "Morph": {
+        "Creature": "fae77915e46118b4daefed2e46af6241",
+        "Duration": 50,
+        "HealthCost": 15,
+        "RequiredLevel": 6
+      }
+    },
+    {
+      "ReadableId": "mage_recipe_morph_hungryripper",
+      "Base": "recipe_flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "BuyValue": 300,
+      "SellValue": 60,
+      "LearnSpell": "mage_morph_hungryripper"
+    },
+    {
+      "ReadableId": "mage_morph_rotmoorfly",
+      "Base": "flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "IconItem": "item_bloodquitostinger",
+      "Morph": {
+        "Creature": "31351ce9230d16544b6782cec2d50485",
+        "Duration": 50,
+        "HealthCost": 15,
+        "RequiredLevel": 8
+      }
+    },
+    {
+      "ReadableId": "mage_recipe_morph_rotmoorfly",
+      "Base": "recipe_flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "BuyValue": 400,
+      "SellValue": 80,
+      "LearnSpell": "mage_morph_rotmoorfly"
+    },
+    {
+      "ReadableId": "mage_morph_ripper",
+      "Base": "flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "IconItem": "item_ripper_head",
+      "Morph": {
+        "Creature": "8074729ab27467d42bbb9c783c2f9758",
+        "Duration": 45,
+        "HealthCost": 20,
+        "RequiredLevel": 10
+      }
+    },
+    {
+      "ReadableId": "mage_recipe_morph_ripper",
+      "Base": "recipe_flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "BuyValue": 600,
+      "SellValue": 120,
+      "LearnSpell": "mage_morph_ripper"
+    },
+    {
+      "ReadableId": "mage_morph_boar",
+      "Base": "flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "IconItem": "item_boartusk",
+      "Morph": {
+        "Creature": "087395a8b20322e4ba29389a3c59bb72",
+        "Duration": 45,
+        "HealthCost": 20,
+        "RequiredLevel": 12
+      }
+    },
+    {
+      "ReadableId": "mage_recipe_morph_boar",
+      "Base": "recipe_flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "BuyValue": 700,
+      "SellValue": 140,
+      "LearnSpell": "mage_morph_boar"
+    },
+    {
+      "ReadableId": "mage_morph_shadowripper",
+      "Base": "flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "IconItem": "item_essence_void",
+      "Morph": {
+        "Creature": "b80e30fffb7cf9244a9a113fd10a9044",
+        "Duration": 40,
+        "HealthCost": 25,
+        "RequiredLevel": 15
+      }
+    },
+    {
+      "ReadableId": "mage_recipe_morph_shadowripper",
+      "Base": "recipe_flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "BuyValue": 900,
+      "SellValue": 180,
+      "LearnSpell": "mage_morph_shadowripper"
+    },
+    {
+      "ReadableId": "mage_morph_harpy",
+      "Base": "flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "IconItem": "item_harpyiefeather",
+      "Morph": {
+        "Creature": "bfb1082c84fbee04d96b472fed196f97",
+        "Duration": 35,
+        "HealthCost": 25,
+        "RequiredLevel": 18
+      }
+    },
+    {
+      "ReadableId": "mage_recipe_morph_harpy",
+      "Base": "recipe_flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "BuyValue": 1200,
+      "SellValue": 240,
+      "LearnSpell": "mage_morph_harpy"
+    },
+    {
+      "ReadableId": "mage_morph_bear",
+      "Base": "flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "IconItem": "item_bear_claw",
+      "Morph": {
+        "Creature": "2baa51ad3cad0d348afe060d0449d644",
+        "Duration": 35,
+        "HealthCost": 30,
+        "RequiredLevel": 20
+      }
+    },
+    {
+      "ReadableId": "mage_recipe_morph_bear",
+      "Base": "recipe_flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "BuyValue": 1400,
+      "SellValue": 280,
+      "LearnSpell": "mage_morph_bear"
+    }
+  ]
+}

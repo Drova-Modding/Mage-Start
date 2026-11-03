@@ -1,0 +1,5 @@
+# Ends $P's morph after morph_form.part: nothing reached the hidden player during the fights.
+
+$P expect morph contains "caster=$caster"
+$P morph end
+$P expect morph == morphed=0 timeout=5
