@@ -1,0 +1,23 @@
+# One attack key of B's creature wounds the shared ripper, seen on A's machine, in four tries.
+# The root trap holds the ripper still on both machines, so the attacks are tested, not the aim.
+# Parameters: key (PrimaryAttack, SecondaryAttack or Dodge), at (distance to strike from), gap (seconds between tries), ripper.
+
+A effect add StatusEffect_RootTrap_Root $ripper
+B effect add StatusEffect_RootTrap_Root $ripper
+A health $ripper mark
+B tpnear $ripper $at 0
+B look $ripper
+B expect press $key 0.2 !contains "Stunned" timeout=10
+sleep $gap
+B tpnear $ripper $at 0
+B look $ripper
+B expect press $key 0.2 !contains "Stunned" timeout=10
+sleep $gap
+B tpnear $ripper $at 0
+B look $ripper
+B expect press $key 0.2 !contains "Stunned" timeout=10
+sleep $gap
+B tpnear $ripper $at 0
+B look $ripper
+B expect press $key 0.2 !contains "Stunned" timeout=10
+A expect health $ripper lost >= 1 timeout=8

@@ -1,0 +1,42 @@
+# One of Rowan's morph forms on player $P: cast for its health cost, the creature is scaled and armed, both attack keys
+# hurt a fresh red fox, and a kill pays the player's experience. The morph keeps running: morph_end.part ends it.
+# Parameters: P (player letter), form (item suffix), body (prefab name), caster (the hidden player's health after the cost),
+# reach (distance to strike from), secondary (the second key to test, PrimaryAttack again for a one-attack creature),
+# reach2 (distance for the second key: ranged attacks miss up close), gap (seconds between tries, longer for slow attacks).
+
+$P run adjusthealth 1000
+$P xp mark
+$P expect useitem mage_morph_$form 0.3 idle contains "used mage_morph_$form" timeout=20
+$P expect morph contains "body=$body" timeout=10
+$P expect morph contains "caster=$caster"
+$P expect mage_morph contains "buffed=1" timeout=5
+# The morph itself pays no experience, only kills do.
+$P expect xp gained == 0
+$P invincible on
+
+# Back to dry ground first: every fight ends a few steps east, and the bear cannot reach a fox in the water.
+$P tp $spot
+$P spawn RedFox 60 0
+$P expect actors 300 contains "RedFox" timeout=30
+# The root trap holds the fox still, so the attacks are tested, not the aim.
+$P effect add StatusEffect_RootTrap_Root RedFox
+$P tpnear RedFox $reach 0
+$P look RedFox
+$P expect press PrimaryAttack 0.2 !contains "Stunned" timeout=10
+sleep $gap
+$P tpnear RedFox $reach 0
+$P look RedFox
+$P expect press PrimaryAttack 0.2 !contains "Stunned" timeout=10
+sleep $gap
+$P tpnear RedFox $reach 0
+$P look RedFox
+$P expect press PrimaryAttack 0.2 !contains "Stunned" timeout=10
+$P expect health RedFox !contains "500/500" timeout=6
+
+$P xp mark
+$P hit RedFox 9999 pure
+$P expect xp gained >= 150 timeout=5
+
+set key $secondary
+set at $reach2
+include morph_attack.part

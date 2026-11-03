@@ -1,0 +1,5 @@
+# Ends B's morph after morph_coop_form.part: A sees B human again.
+
+B morph end
+B expect morph == morphed=0 timeout=5
+A expect actors 800 !contains "Morph" timeout=10

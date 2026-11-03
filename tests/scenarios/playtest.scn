@@ -1,0 +1,43 @@
+# Not a test: sets up a level 20 game with every morph spell on profile C and hands over the controls.
+# Debug builds of the Modding API and MageDrova, deployed with Data/Items/mage_mod.json.
+#
+# dotnet run --project "../Drova Modding API/tools/Drova.TestRunner" -c Debug -- tests/scenarios/playtest.scn --keep
+
+default hero 5
+default slot 0
+
+launch C
+C wait ready=1 timeout=240
+C wait saves=separate timeout=1
+C load $hero $slot
+C wait world=1 timeout=240
+
+C give mage_morph_waterrat 1
+C give mage_morph_bloodfly 1
+C give mage_morph_hungryripper 1
+C give mage_morph_rotmoorfly 1
+C give mage_morph_ripper 1
+C give mage_morph_boar 1
+C give mage_morph_shadowripper 1
+C give mage_morph_harpy 1
+C give mage_morph_bear 1
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C run levelup
+C realinput on
