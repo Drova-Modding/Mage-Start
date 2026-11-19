@@ -205,3 +205,16 @@ A hit me 9999 pure nosource
 A expect morph == morphed=0 timeout=5
 sleep 1
 A expect health me == 1/135 timeout=3
+
+# Silverback: two famished rippers join the creature and die with the morph. 145 - 44 for the cast.
+A run levelup
+A run levelup
+A give mage_morph_silverback 1
+A run adjusthealth 1000
+A expect useitem mage_morph_silverback 0.3 idle contains "used mage_morph_silverback" timeout=20
+A expect morph contains "body=EliteRipper" timeout=10
+A expect morph contains "caster=101/145"
+A expect mage_summons == alive=2 timeout=10
+A morph end
+A expect morph == morphed=0 timeout=5
+A expect mage_summons == alive=0 timeout=5

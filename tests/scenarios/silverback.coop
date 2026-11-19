@@ -1,0 +1,102 @@
+# The Silverback in a session, cast by the client and then by the host. Either way the host spawns the two famished rippers
+# and both machines see them. They leave the human teammate alone, turn on a ripper their Silverback wounds, and die on both
+# machines when the morph ends.
+# Debug builds of the Modding API, Drova-Coop-Mod and MageDrova, deployed with Data/Items/mage_mod.json.
+#
+# dotnet run --project "../Drova Modding API/tools/Drova.TestRunner" -c Debug -- tests/scenarios/silverback.coop
+
+include ../../../Drova-Coop-Mod/tests/scenarios/session.coop
+
+set ripper 6be18490-966b-47a5-bb24-f587c154aa28
+
+# The Silverback needs level 22.
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A run levelup
+B run levelup
+A give mage_morph_silverback 1
+B give mage_morph_silverback 1
+A stance combat
+B stance combat
+
+# The client is the Silverback. The host spawns its pack, the client's machine takes the copies.
+B tpnear $ripper 150 0
+A tpnear $ripper 450 0
+A expect near $ripper 1000 contains "loaded" timeout=15
+B expect near $ripper 1000 contains "loaded" timeout=15
+A run adjusthealth 1000
+B run adjusthealth 1000
+B expect useitem mage_morph_silverback 0.3 idle contains "used mage_morph_silverback" timeout=20
+B expect morph contains "body=EliteRipper" timeout=10
+B invincible on
+A expect mage_summons == alive=2 timeout=15
+B expect mage_summons == alive=2 timeout=15
+# A stands beside the pack: nothing it does may reach A.
+A tpnear $ripper 170 0
+sleep 5
+A expect health me == 145/145
+
+# B wounds a ripper. The host marks the kind on B's creature, and the pack it drives goes for the ripper.
+B tpnear $ripper 12 0
+B look $ripper
+B expect press PrimaryAttack 0.2 !contains "Stunned" timeout=10
+A expect ai HungryRipper contains "target=Ripper" timeout=20
+
+B morph end
+B expect morph == morphed=0 timeout=5
+A expect mage_summons == alive=0 timeout=5
+B expect mage_summons == alive=0 timeout=5
+
+# The host is the Silverback, away from the angry rippers. The client sees the pack and is left alone.
+A tpnear $ripper 900 0
+B tpnear $ripper 930 0
+A run adjusthealth 1000
+B run adjusthealth 1000
+A expect useitem mage_morph_silverback 0.3 idle contains "used mage_morph_silverback" timeout=20
+A expect morph contains "body=EliteRipper" timeout=10
+A expect mage_summons == alive=2 timeout=15
+B expect mage_summons == alive=2 timeout=15
+sleep 5
+B expect health me == 145/145
+A morph end
+A expect morph == morphed=0 timeout=5
+A expect mage_summons == alive=0 timeout=5
+B expect mage_summons == alive=0 timeout=5
