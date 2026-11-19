@@ -61,7 +61,8 @@ namespace MageDrova
             [AddressableAccess.Creatures.Boar.AssetGUID] = (0.35f, 1f, 12),
             [AddressableAccess.Creatures.ShadowRipper.AssetGUID] = (0.25f, 1.1f, 15),
             [AddressableAccess.Creatures.Harpy.AssetGUID] = (0.2f, 1.3f, 18),
-            [AddressableAccess.Creatures.Bear.AssetGUID] = (0.2f, 2f, 20)
+            [AddressableAccess.Creatures.Bear.AssetGUID] = (0.2f, 2f, 20),
+            [AddressableAccess.Creatures.EliteRipper.AssetGUID] = (0.4f, 1.3f, 22)
         };
 
         /// <summary>
@@ -112,11 +113,15 @@ namespace MageDrova
             ("mage_morph_boar_name", "Boar Form", "Gestalt des Ebers"),
             ("mage_morph_boar_description", "Turns you into a boar. Costs 20% health. Needs level 12.", "Verwandelt dich in einen Eber. Kostet 20 % Lebenspunkte. Ab Level 12."),
             ("mage_morph_shadowripper_name", "Shadowripper Form", "Gestalt des Schattenreißers"),
-            ("mage_morph_shadowripper_description", "Turns you into a shadowripper. Costs 25% health. Needs level 15.", "Verwandelt dich in einen Schattenreißer. Kostet 25 % Lebenspunkte. Ab Level 15."),
+            ("mage_morph_shadowripper_description", "Turns you into a shadowripper. Costs 25% health. Needs level 15.",
+            "Verwandelt dich in einen Schattenreißer. Kostet 25 % Lebenspunkte. Ab Level 15."),
             ("mage_morph_harpy_name", "Harpy Form", "Gestalt der Harpyie"),
             ("mage_morph_harpy_description", "Turns you into a harpy. Costs 25% health. Needs level 18.", "Verwandelt dich in eine Harpyie. Kostet 25 % Lebenspunkte. Ab Level 18."),
             ("mage_morph_bear_name", "Bear Form", "Gestalt des Bären"),
             ("mage_morph_bear_description", "Turns you into a bear. Costs 30% health. Needs level 20.", "Verwandelt dich in einen Bären. Kostet 30 % Lebenspunkte. Ab Level 20."),
+            ("mage_morph_silverback_name", "Silverback Form", "Gestalt des Silberrückens"),
+            ("mage_morph_silverback_description", "Turns you into a silverback, the alpha of the rippers. Two famished rippers join your hunt. Costs 30% health. Needs level 22.",
+            "Verwandelt dich in einen Silberrücken, den Leitreißer. Zwei ausgehungerte Reißer jagen mit dir. Kostet 30 % Lebenspunkte. Ab Level 22."),
             ("mage_recipe_morph_waterrat_name", "Spell: Water Rat Form", "Zauber: Gestalt der Wasserratte"),
             ("mage_recipe_morph_bloodfly_name", "Spell: Giant Gnat Form", "Zauber: Gestalt der Riesenmücke"),
             ("mage_recipe_morph_hungryripper_name", "Spell: Famished Ripper Form", "Zauber: Gestalt des ausgehungerten Reißers"),
@@ -126,12 +131,13 @@ namespace MageDrova
             ("mage_recipe_morph_shadowripper_name", "Spell: Shadowripper Form", "Zauber: Gestalt des Schattenreißers"),
             ("mage_recipe_morph_harpy_name", "Spell: Harpy Form", "Zauber: Gestalt der Harpyie"),
             ("mage_recipe_morph_bear_name", "Spell: Bear Form", "Zauber: Gestalt des Bären"),
+            ("mage_recipe_morph_silverback_name", "Spell: Silverback Form", "Zauber: Gestalt des Silberrückens"),
             ("recipe_description",
             "Teaches a morph when you carry a runestone. Mind makes it last longer and hit harder, Strength makes it tougher, Dexterity crits more often. In creature form the weapon swap key switches its attacks and the dodge key uses its special attack.",
             "Lehrt eine Verwandlung, wenn du einen Runenstein trägst. Geist verlängert sie und erhöht den Schaden, Stärke macht sie zäher, Geschick erhöht die Chance auf kritische Treffer. In Tiergestalt wechselt die Waffenwechsel-Taste die Angriffe, die Ausweichen-Taste löst den Spezialangriff aus."),
         ];
 
-        private static readonly string[] MorphIds = ["waterrat", "bloodfly", "hungryripper", "rotmoorfly", "ripper", "boar", "shadowripper", "harpy", "bear"];
+        private static readonly string[] MorphIds = ["waterrat", "bloodfly", "hungryripper", "rotmoorfly", "ripper", "boar", "shadowripper", "harpy", "bear", "silverback"];
 
         /// <summary>
         /// Whether the running or last morph is one of Rowan's. The API clears the creature guid before the end event.
@@ -139,6 +145,7 @@ namespace MageDrova
         private static bool _isOwnMorph;
 
         private static float _drawWeaponUntil;
+
         /// <summary>
         /// The factors the last Rowan morph got, for the log and the test agent.
         /// </summary>

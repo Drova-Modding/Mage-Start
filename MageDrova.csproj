@@ -382,6 +382,7 @@
 		<Compile Include="MageOptions.cs" />
 		<Compile Include="Morphing.cs" />
 		<Compile Include="MorphCritPatch.cs" />
+		<Compile Include="MorphSummons.cs" />
 		<Compile Include="TalentActorModulePatch.cs" />
 		<Content Include="Directory.Build.props" />
 	</ItemGroup>
