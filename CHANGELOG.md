@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0] - 2026-11-19
+### Added
+- **Silverback Form:** a tenth morph spell, sold by Rowan from chapter 4 and castable from level 22. The alpha of the rippers brings two famished rippers that fight at your side, turn on any creature you attack, including other rippers, and die when the morph ends.
+- In co-op both players see the pack, and it never attacks a teammate.
+
+Needs Drova Modding API 0.9.1. Older versions turn the famished rippers hostile if you hit one of them by accident. In co-op the pack of a player who joined fights alongside them with Drova Coop 0.4.2.
+
 ## [1.3.0] - 2026-11-03
 ### Added
 - **Morph spells:** Rowan the Mage sells nine spells that turn you into a creature. Water Rat, Giant Gnat, Famished Ripper, Bloodfly, Ripper, Boar, Shadowripper, Harpy and Bear unlock from level 1 to level 20. Learning one needs a runestone, and casting it costs health.

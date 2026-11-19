@@ -21,7 +21,7 @@ using Drova_Modding_API.Systems.Testing;
 using Il2CppDrova.GUI;
 #endif
 
-[assembly: MelonInfo(typeof(MageDrova.Core), "MageDrova", "1.3.0", "TrustNoOneElse")]
+[assembly: MelonInfo(typeof(MageDrova.Core), "MageDrova", "1.4.0", "TrustNoOneElse")]
 [assembly: MelonGame("Just2D", "Drova")]
 [assembly: MelonAdditionalDependencies("Drova_Modding_API")]
 
@@ -45,8 +45,10 @@ namespace MageDrova
             SaveGameSystem.BeforeSaveGameLoaded += OnBeforeSaveGameLoaded;
             MageOptions.Register();
             Morphing.Register();
+            MorphSummons.Register();
 #if DEBUG
             TestAgent.RegisterCommand("mage_morph", _ => Morphing.LastScaling);
+            TestAgent.RegisterCommand("mage_summons", _ => "alive=" + MorphSummons.Alive);
             TestAgent.RegisterCommand("mage_stance", _ => MorphManager.Body is Actor body
                 ? $"mode={body.GetInteractionModule().CurrentMode} changing={(body.GetInteractionModule().IsChangingMode ? 1 : 0)}"
                 : "none");
@@ -136,6 +138,7 @@ namespace MageDrova
         public override void OnUpdate()
         {
             Morphing.Update();
+            MorphSummons.Update();
             InputAction? endMorph = InputActionRegister.Instance?[MageOptions.EndMorphAction];
             if (endMorph != null && endMorph.WasPressedThisFrame())
             {

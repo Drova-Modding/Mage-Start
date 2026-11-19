@@ -180,6 +180,26 @@
       "BuyValue": 1400,
       "SellValue": 280,
       "LearnSpell": "mage_morph_bear"
+    },
+    {
+      "ReadableId": "mage_morph_silverback",
+      "Base": "flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "IconItem": "item_ripper_head_huntTheRipper",
+      "Morph": {
+        "Creature": "319a5f954e5769e4189465e6d7c3b686",
+        "Duration": 35,
+        "HealthCost": 30,
+        "RequiredLevel": 22
+      }
+    },
+    {
+      "ReadableId": "mage_recipe_morph_silverback",
+      "Base": "recipe_flow_energyProjectile",
+      "LocaPath": "MageDrovaMorph",
+      "BuyValue": 1600,
+      "SellValue": 320,
+      "LearnSpell": "mage_morph_silverback"
     }
   ]
 }
